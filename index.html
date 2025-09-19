@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Full Presentation Layout</title>
+  <title>Presentation Website</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; text-align: center; background: #fff; }
 
-    /* Image-only sections (non-clickable) */
+    /* Non-clickable image sections */
     .image-section {
       display: flex;
       justify-content: center;
@@ -19,27 +19,32 @@
       width: 90%;
       height: auto;
       display: block;
+      margin: auto;
     }
 
-    /* Top 4 Box Grid */
+    /* Top 4 grid */
     .top-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
+      width: 100%;
     }
     .top-grid img {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      height: auto;
+      display: block;
       cursor: pointer;
     }
+    @media screen and (max-width: 768px) {
+      .top-grid { grid-template-columns: 1fr; }
+    }
 
-    /* Gradient photo grid */
+    /* Gradient grid */
     .photo-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 20px;
       width: 90%;
-      max-width: 1400px;
+      max-width: 1200px;
       margin: auto;
     }
     .photo-grid img {
@@ -48,7 +53,7 @@
       cursor: pointer;
     }
 
-    /* Lightbox gallery */
+    /* Lightbox */
     .lightbox {
       display: none;
       position: fixed;
@@ -63,7 +68,7 @@
       max-width: 90%;
       max-height: 80%;
     }
-    .lightbox:target { display: flex; }
+    .lightbox.active { display: flex; }
 
     .close {
       position: absolute;
@@ -73,6 +78,7 @@
       color: white;
       text-decoration: none;
       font-weight: bold;
+      cursor: pointer;
     }
     .nav {
       position: absolute;
@@ -82,6 +88,7 @@
       text-decoration: none;
       transform: translateY(-50%);
       padding: 10px;
+      cursor: pointer;
     }
     .prev { left: 20px; }
     .next { right: 20px; }
@@ -89,142 +96,103 @@
 </head>
 <body>
 
-  <!-- Yellow Section (non-clickable) 
-  <section class="image-section">
-    <img src="images/bg_yellow.jpg" alt="Yellow Section">
-  </section>-->
-
-  <!-- Top 4 Boxes (clickable images) -->
+  <!-- Top 4 Boxes -->
   <div class="top-grid">
-    <a href="#img1"><img src="images/image1.png" alt="Image 1"></a>
-    <a href="#img2"><img src="images/image2.png" alt="Image 2"></a>
-    <a href="#img3"><img src="images/image3.png" alt="Image 3"></a>
-    <a href="#img4"><img src="images/image4.png" alt="Image 4"></a>
+    <img src="images/image1.png" alt="Image 1" onclick="openLightbox('top',0)">
+    <img src="images/image2.png" alt="Image 2" onclick="openLightbox('top',1)">
+    <img src="images/image3.png" alt="Image 3" onclick="openLightbox('top',2)">
+    <img src="images/image4.png" alt="Image 4" onclick="openLightbox('top',3)">
   </div>
 
-  <!-- Black Section (non-clickable) -->
+  <!-- Black Section -->
   <section class="image-section" style="background-color: #f7c200;">
-    <img src="images/bg_1.png" alt="Black Section">
+    <img id="bg1" src="images/bg_1_h.png" alt="Black Section">
   </section>
 
-  <!-- Yellow Section 2 (non-clickable) -->
+  <!-- Yellow Section 2 -->
   <section class="image-section" style="background-color: #f1f2f2;">
-    <img src="images/bg_2.png" alt="Yellow Section 2">
+    <img id="bg2" src="images/bg_2_h.png" alt="Yellow Section 2">
   </section>
 
-  <!-- Grey Section (non-clickable) 
-  <section class="image-section">
-    <img src="images/bg_2.png" alt="Grey Section">
-  </section>-->
-
-  <!-- Gradient Section with 4 clickable images -->
-  <section style="padding:50px 0;">
+  <!-- Gradient Section -->
+  <section style="padding:50px 0; background:linear-gradient(135deg,#ffd700,#ff6600);">
     <div class="photo-grid">
-      <a href="#img5"><img src="images/s01.png" alt="Image 5"></a>
-      <a href="#img6"><img src="images/s02.png" alt="Image 6"></a>
-      <a href="#img7"><img src="images/s03.png" alt="Image 7"></a>
-      <a href="#img8"><img src="images/s04.png" alt="Image 8"></a>
+      <img src="images/s01.png" alt="Gradient Image 1" onclick="openLightbox('grad',0)">
+      <img src="images/s02.png" alt="Gradient Image 2" onclick="openLightbox('grad',1)">
+      <img src="images/s03.png" alt="Gradient Image 3" onclick="openLightbox('grad',2)">
+      <img src="images/s04.png" alt="Gradient Image 4" onclick="openLightbox('grad',3)">
     </div>
   </section>
 
-  <!-- Long Grey Section (non-clickable) -->
-  <section class="image-section">
-    <img src="images/bg_3.png" alt="Long Grey Section">
+  <!-- Long Grey Section -->
+  <section class="image-section" style="background-color:#f1f2f2;">
+    <img id="bg3" src="images/bg_3_h.png" alt="Long Grey Section">
   </section>
 
-  <!-- Lightbox Gallery (only for 8 clickable images) -->
-  <div id="img1" class="lightbox">
-    <a href="#" class="close">&times;</a>
-    <a href="#img8" class="nav prev">&#10094;</a>
-    <img src="images/image1.png" alt="Image 1">
-    <a href="#img2" class="nav next">&#10095;</a>
+  <!-- Lightbox container -->
+  <div id="lightbox" class="lightbox">
+    <span class="close" onclick="closeLightbox()">&times;</span>
+    <a class="nav prev" onclick="changeImage(-1)">&#10094;</a>
+    <img id="lightbox-img" src="" alt="">
+    <a class="nav next" onclick="changeImage(1)">&#10095;</a>
   </div>
 
-  <div id="img2" class="lightbox">
-    <a href="#" class="close">&times;</a>
-    <a href="#img1" class="nav prev">&#10094;</a>
-    <img src="images/image2.png" alt="Image 2">
-    <a href="#img3" class="nav next">&#10095;</a>
-  </div>
-
-  <div id="img3" class="lightbox">
-    <a href="#" class="close">&times;</a>
-    <a href="#img2" class="nav prev">&#10094;</a>
-    <img src="images/image3.png" alt="Image 3">
-    <a href="#img4" class="nav next">&#10095;</a>
-  </div>
-
-  <div id="img4" class="lightbox">
-    <a href="#" class="close">&times;</a>
-    <a href="#img3" class="nav prev">&#10094;</a>
-    <img src="images/image4.png" alt="Image 4">
-    <a href="#img5" class="nav next">&#10095;</a>
-  </div>
-
-  <div id="img5" class="lightbox">
-    <a href="#" class="close">&times;</a>
-    <a href="#img4" class="nav prev">&#10094;</a>
-    <img src="images/s01.png" alt="Image 5">
-    <a href="#img6" class="nav next">&#10095;</a>
-  </div>
-
-  <div id="img6" class="lightbox">
-    <a href="#" class="close">&times;</a>
-    <a href="#img5" class="nav prev">&#10094;</a>
-    <img src="images/s02.png" alt="Image 6">
-    <a href="#img7" class="nav next">&#10095;</a>
-  </div>
-
-  <div id="img7" class="lightbox">
-    <a href="#" class="close">&times;</a>
-    <a href="#img6" class="nav prev">&#10094;</a>
-    <img src="images/s03.png" alt="Image 7">
-    <a href="#img8" class="nav next">&#10095;</a>
-  </div>
-
-  <div id="img8" class="lightbox">
-    <a href="#" class="close">&times;</a>
-    <a href="#img7" class="nav prev">&#10094;</a>
-    <img src="images/s04.png" alt="Image 8">
-    <a href="#img1" class="nav next">&#10095;</a>
-  </div>
-<script>
-  document.addEventListener('keydown', function(event) {
-    if (event.key === "Escape") {
-      // alisin ang hash para isara ang lightbox
-      window.location.hash = "";
+  <script>
+    // Orientation-based background switching
+    function updateBackgrounds() {
+      const portrait = window.matchMedia("(orientation: portrait)").matches;
+      const sections = [
+        { id: "bg1", portrait: "images/bg_1_v.png", landscape: "images/bg_1_h.png" },
+        { id: "bg2", portrait: "images/bg_2_v.png", landscape: "images/bg_2_h.png" },
+        { id: "bg3", portrait: "images/bg_3_v.png", landscape: "images/bg_3_h.png" }
+      ];
+      sections.forEach(sec => {
+        const el = document.getElementById(sec.id);
+        if (el) el.src = portrait ? sec.portrait : sec.landscape;
+      });
     }
-  });
-</script>
+    window.addEventListener("load", updateBackgrounds);
+    window.addEventListener("resize", updateBackgrounds);
 
-<script>
-  document.addEventListener('keydown', function(event) {
-    // ESC key: close lightbox
-    if (event.key === "Escape") {
-      window.location.hash = "";
+    // Lightbox logic
+    const galleries = {
+      top: ["images/image1.png","images/image2.png","images/image3.png","images/image4.png"],
+      grad: ["images/s01.png","images/s02.png","images/s03.png","images/s04.png"]
+    };
+    let currentGallery = null;
+    let currentIndex = 0;
+
+    function openLightbox(gallery, index) {
+      currentGallery = gallery;
+      currentIndex = index;
+      document.getElementById("lightbox-img").src = galleries[gallery][index];
+      document.getElementById("lightbox").classList.add("active");
     }
 
-    // Hanapin kung may bukas na lightbox
-    const currentHash = window.location.hash;
-    if (!currentHash) return; // wala, exit
-
-    const ids = ["#img1","#img2","#img3","#img4","#img5","#img6","#img7","#img8"];
-    let index = ids.indexOf(currentHash);
-
-    // Left Arrow: previous
-    if (event.key === "ArrowLeft") {
-      index = (index - 1 + ids.length) % ids.length;
-      window.location.hash = ids[index];
+    function closeLightbox() {
+      document.getElementById("lightbox").classList.remove("active");
+      currentGallery = null;
     }
 
-    // Right Arrow: next
-    if (event.key === "ArrowRight") {
-      index = (index + 1) % ids.length;
-      window.location.hash = ids[index];
+    function changeImage(direction) {
+      if (!currentGallery) return;
+      currentIndex = (currentIndex + direction + galleries[currentGallery].length) % galleries[currentGallery].length;
+      document.getElementById("lightbox-img").src = galleries[currentGallery][currentIndex];
     }
-  });
-</script>
 
+    document.addEventListener("keydown", function(event) {
+      if (!currentGallery) return;
+      if (event.key === "Escape") {
+        closeLightbox();
+      }
+      if (event.key === "ArrowLeft") {
+        changeImage(-1);
+      }
+      if (event.key === "ArrowRight") {
+        changeImage(1);
+      }
+    });
+  </script>
 
 </body>
 </html>
