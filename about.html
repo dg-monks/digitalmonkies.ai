@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presentation Website</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; text-align: center; background: #fff; }
+
+    /* Non-clickable image sections */
+    .image-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 0;
+    }
+    .image-section img {
+      width: 90%;
+      height: auto;
+      display: block;
+      margin: auto;
+    }
+
+    /* Top 4 grid */
+    .top-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      width: 100%;
+    }
+    .top-grid img {
+      width: 100%;
+      height: auto;
+      display: block;
+      cursor: pointer;
+    }
+    @media screen and (max-width: 768px) {
+      .top-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Gradient grid */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+    }
+    .photo-grid img {
+      width: 100%;
+      height: auto;
+      cursor: pointer;
+    }
+
+    /* Lightbox */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 999;
+    }
+    .lightbox img {
+      max-width: 90%;
+      max-height: 80%;
+    }
+    .lightbox.active { display: flex; }
+
+    .close {
+      position: absolute;
+      top: 20px;
+      right: 40px;
+      font-size: 2rem;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .nav {
+      position: absolute;
+      top: 50%;
+      font-size: 3rem;
+      color: white;
+      text-decoration: none;
+      transform: translateY(-50%);
+      padding: 10px;
+      cursor: pointer;
+    }
+    .prev { left: 20px; }
+    .next { right: 20px; }
+  </style>
+</head>
+<body>
+
+  <!-- Top 4 Boxes -->
+  <div class="top-grid">
+    <img src="images/image1.png" alt="Image 1" onclick="openLightbox('top',0)">
+    <img src="images/image2.png" alt="Image 2" onclick="openLightbox('top',1)">
+    <img src="images/image3.png" alt="Image 3" onclick="openLightbox('top',2)">
+    <img src="images/image4.png" alt="Image 4" onclick="openLightbox('top',3)">
+  </div>
+
+  <!-- Black Section -->
+  <section class="image-section" style="background-color: #f7c200;">
+    <img id="bg1" src="images/bg_1_h.png" alt="Black Section">
+  </section>
+
+<!-- Yellow Section 2 -->
+<section style="background-color: #f1f2f2; padding: 40px 0;">
+  <div style="
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+    gap: 20px; 
+    width: 90%; 
+    margin: auto;">
+    
+    <img src="images/y2_1.png" alt="Yellow Image 1" style="width:100%; height:auto;">
+    <img src="images/y2_2.png" alt="Yellow Image 2" style="width:100%; height:auto;">
+    <img src="images/y2_3.png" alt="Yellow Image 3" style="width:100%; height:auto;">
+  </div>
+</section>
+
+
+  <!-- Gradient Section -->
+  <section style="padding:50px 0; background:linear-gradient(135deg,#ffd700,#ff6600);">
+    <div class="photo-grid">
+      <img src="images/s01.png" alt="Gradient Image 1" onclick="openLightbox('grad',0)">
+      <img src="images/s02.png" alt="Gradient Image 2" onclick="openLightbox('grad',1)">
+      <img src="images/s03.png" alt="Gradient Image 3" onclick="openLightbox('grad',2)">
+      <img src="images/s04.png" alt="Gradient Image 4" onclick="openLightbox('grad',3)">
+    </div>
+  </section>
+
+  <!-- Long Grey Section -->
+  <section class="image-section" style="background-color:#f1f2f2;">
+    <img id="bg3" src="images/bg_3_h.png" alt="Long Grey Section">
+  </section>
+
+  <!-- Lightbox container -->
+  <div id="lightbox" class="lightbox">
+    <span class="close" onclick="closeLightbox()">&times;</span>
+    <a class="nav prev" onclick="changeImage(-1)">&#10094;</a>
+    <img id="lightbox-img" src="" alt="">
+    <a class="nav next" onclick="changeImage(1)">&#10095;</a>
+  </div>
+
+  <script>
+    // Orientation-based background switching
+    function updateBackgrounds() {
+      const portrait = window.matchMedia("(orientation: portrait)").matches;
+      const sections = [
+        { id: "bg1", portrait: "images/bg_1_v.png", landscape: "images/bg_1_h.png" },
+        { id: "bg3", portrait: "images/bg_3_v.png", landscape: "images/bg_3_h.png" }
+      ];
+      sections.forEach(sec => {
+        const el = document.getElementById(sec.id);
+        if (el) el.src = portrait ? sec.portrait : sec.landscape;
+      });
+    }
+    window.addEventListener("load", updateBackgrounds);
+    window.addEventListener("resize", updateBackgrounds);
+
+    // Lightbox logic
+    const galleries = {
+      top: ["images/image1.png","images/image2.png","images/image3.png","images/image4.png"],
+      grad: ["images/s01.png","images/s02.png","images/s03.png","images/s04.png"]
+    };
+    let currentGallery = null;
+    let currentIndex = 0;
+
+    function openLightbox(gallery, index) {
+      currentGallery = gallery;
+      currentIndex = index;
+      document.getElementById("lightbox-img").src = galleries[gallery][index];
+      document.getElementById("lightbox").classList.add("active");
+    }
+
+    function closeLightbox() {
+      document.getElementById("lightbox").classList.remove("active");
+      currentGallery = null;
+    }
+
+    function changeImage(direction) {
+      if (!currentGallery) return;
+      currentIndex = (currentIndex + direction + galleries[currentGallery].length) % galleries[currentGallery].length;
+      document.getElementById("lightbox-img").src = galleries[currentGallery][currentIndex];
+    }
+
+    document.addEventListener("keydown", function(event) {
+      if (!currentGallery) return;
+      if (event.key === "Escape") {
+        closeLightbox();
+      }
+      if (event.key === "ArrowLeft") {
+        changeImage(-1);
+      }
+      if (event.key === "ArrowRight") {
+        changeImage(1);
+      }
+    });
+  </script>
+
+
+
+</body>
+</html>
